@@ -29,9 +29,11 @@ class Crud():
         self.session.commit()
 
     def delete_user(self, first_name: str, second_name: str, e_mail: str):
-        delete_object = self.session.execute(select(User).where(User.first_name == first_name,
+        delete_object = self.session.execute(select(User.id).where(User.first_name == first_name,
                                                                 User.second_name == second_name,
-                                                                User.e_mail == e_mail)).first()
+                                                                User.e_mail == e_mail
+                                                                )).first()
+        print(type(delete_object))
         self.session.delete(delete_object)
         self.session.commit()
 
@@ -39,4 +41,4 @@ class Crud():
 if __name__ == "__main__":
     print(Crud().get_user(1).first_name)
    # Crud().add_user("Steve", "Sigal", "sigal@mail.ru", "Siatl")
-    Crud().delete_user("Steve", "Sigal", "sigal@mail.ru")
+    Crud().delete_user("Jorg", "Bush", "usa@usa.com")

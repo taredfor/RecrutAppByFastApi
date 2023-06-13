@@ -1,15 +1,13 @@
 from fastapi import FastAPI
 from data_request_model import User
-import psycopg2
-from sqlalchemy import create_engine
+from crud.crud import Crud
+from password_utils.password_utils import hash_password, verify_password
 
 app = FastAPI()
 
-HOST_DB = 'localhost'
-PORT = 3306
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'qwerty123'
-MYSQL_DB = 'Recrut'
+crud = Crud()
+
+
 @app.get('/')
 async def test():
     return {'hello': 'recrut'}
@@ -17,10 +15,18 @@ async def test():
 
 @app.post('/add-user')
 async def add_user(parameters: User):
-    conn = psycopg2.connect(host=HOST_DB, port=PORT, database=MYSQL_DB, user=MYSQL_USER, password=MYSQL_PASSWORD)
-    cur = conn.cursor()
-    cur.execute("INSERT INTO users(first_name, second_name, planet, e_mail) VALUES(%s,%s,%s,%s)", parameters.first_name, parameters.second_name, parameters.planet, parameters.e_mail)
-    conn.commit()
-    conn.close()
-    cur.close()
+    crud.add_user(parameters.login, parameters.first_name, parameters.second_name, parameters.e_mail, parameters.planet,
+                  hash_password(parameters.pswd))
     return 'User is added'
+
+
+@app.get('/login')
+async def verify_password_main(login: str, pass_wd: str):
+    try:
+        if crud.select_user(login).login:
+            if verify_password(pass_wd, crud.select_user(login).pswd_hash):
+                return 'User authorized successfully'
+            else:
+                return 'Password is not correct'
+    except:
+        return 'Login Not Found'

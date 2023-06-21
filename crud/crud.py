@@ -52,3 +52,9 @@ if __name__ == "__main__":
     #Crud().add_user("Steve", "Sigal", "sigal@mail.ru", "Siatl")
     #Crud().delete_user2("Steve", "Sigal", "sigal@mail.ru")
     print(Crud().select_user("musa1").pswd_hash)
+
+# items = {"foo": "The Foo Wrestlers"}
+# item_id = "foo"
+# if item_id in items:
+#     print(items[item_id])
+

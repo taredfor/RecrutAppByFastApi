@@ -1,7 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from starlette import status
+
 from data_request_model import User
 from crud.crud import Crud
 from password_utils.password_utils import hash_password, verify_password
+from authorization.authorization import create_access_token, get_current_user
 
 app = FastAPI()
 
@@ -22,11 +25,19 @@ async def add_user(parameters: User):
 
 @app.get('/login')
 async def verify_password_main(login: str, pass_wd: str):
+    credentianals_extensions = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                             detail="UNAUthorized",
+                                             headers={"WWW-Authenticate": "Bearer"}, )
     try:
-        if crud.select_user(login).login:
-            if verify_password(pass_wd, crud.select_user(login).pswd_hash):
-                return 'User authorized successfully'
-            else:
-                return 'Password is not correct'
+        user = crud.select_user(login).login
+        if user is None:
+            raise credentianals_extensions
+        if verify_password(pass_wd, crud.select_user(login).pswd_hash) is False:
+            raise credentianals_extensions
     except:
-        return 'Login Not Found'
+        raise credentianals_extensions
+    return create_access_token(login)
+
+@app.get('/test')
+async def test_get_user(token):
+    return get_current_user(token, crud)

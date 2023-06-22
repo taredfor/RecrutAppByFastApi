@@ -1,8 +1,10 @@
+import enum
+
 import sqlalchemy
 import sqlalchemy.orm
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
-from .schemas import User
+from .schemas import User, Questions
 
 
 # engine = create_engine('mysql+mysqldb://root:qwerty123@localhost', pool_recycle=3600)
@@ -45,13 +47,21 @@ class Crud():
         stmt = select(User.id).where(User.login == login)
         return self.get_user(self.session.scalars(stmt).first())
 
+    def add_question(self, question_id: int, type_question: str, content: str, correct_answer: bool):
+        add_object = Questions(question_id=question_id,
+                               type_question=type_question,
+                               content=content,
+                               correct_answer=correct_answer,)
+        self.session.add(add_object)
+        self.session.commit()
 
 # print(__name__)
 if __name__ == "__main__":
-   # print(Crud().get_user(1).first_name)
+    #print(Crud().get_user(1).first_name)
     #Crud().add_user("Steve", "Sigal", "sigal@mail.ru", "Siatl")
     #Crud().delete_user2("Steve", "Sigal", "sigal@mail.ru")
     print(Crud().select_user("musa1").pswd_hash)
+    #Crud().add_question(3, "Question", "FALSE", "Do you like boxing")
 
 # items = {"foo": "The Foo Wrestlers"}
 # item_id = "foo"

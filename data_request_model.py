@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from enum import Enum
 
+
 class User(BaseModel):
     #login: str
     first_name: str
@@ -14,6 +15,12 @@ class Question(BaseModel):
     question_id: int
     type_question: str
     content: str
-    correct_answer: str
+    correct_answer: bool
+
+
+class Answer(BaseModel):
+    question_id: int
+    user_id: int
+    user_answer: str
 
 

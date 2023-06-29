@@ -50,4 +50,13 @@ CREATE TABLE Recruts (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE Answers (
+  id int NOT NULL AUTO_INCREMENT,
+  question_id int NOT NULL,
+  user_id int NOT NULL,
+  is_correct ENUM ("TRUE", "FALSE"),
+  FOREIGN KEY (question_id) REFERENCES Questions(id),
+  FOREIGN KEY (user_id) REFERENCES Users(id),
+  PRIMARY KEY (id)
+);
 

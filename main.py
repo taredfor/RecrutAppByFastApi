@@ -1,14 +1,17 @@
 from fastapi import FastAPI, HTTPException
 from starlette import status
+from enum import Enum
 
-from data_request_model import User, Question
+from data_request_model import User, Question, Answer
 from crud.crud import Crud
 from password_utils.password_utils import hash_password, verify_password
 from authorization.authorization import create_access_token, get_current_user
+from auxiliary_package.range_function import Range
 
 app = FastAPI()
 
 crud = Crud()
+range_func = Range()
 
 
 @app.get('/')
@@ -48,3 +51,22 @@ async def test_get_user(token):
 async def add_new_question(parameter: Question):
     crud.add_question(parameter.question_id, parameter.type_question, parameter.content, parameter.correct_answer)
     return 'Question was added'
+
+@app.post('/add/answer')
+async def add_answer(parameter: Answer):
+    crud.add_answer_user(parameter.question_id, parameter.user_answer, parameter.user_id)
+    return 'Answer was sented'
+
+@app.get('/get-questions')
+async def get_question():
+    d_ict = {}
+    j = 1
+    count_id = crud.get_count_question()
+    list_id = range_func.range_id(count_id)
+    for i in list_id:
+        d_ict[j] = crud.get_question(i).content
+        j += 1
+    return d_ict
+
+
+

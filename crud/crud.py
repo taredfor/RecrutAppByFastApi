@@ -13,26 +13,29 @@ from .schemas import User, Questions, Answers
 class Crud():
     def __init__(self):
         self.engine = sqlalchemy.create_engine('mysql+pymysql://root:qwerty123@localhost/Recrut', pool_recycle=3600,
-                                               echo=True)
+                                               echo=False) #логи sqlalchemy
         self.conn = self.engine.connect()
         Session = sessionmaker()
         Session.configure(bind=self.engine)
         self.session = Session()
 
     def get_user(self, id):
-        self.session.get(User, id)
         return self.session.get(User, id)
 
     def get_question(self, question_id):
         return self.session.get(Questions, question_id)
 
-    def add_user(self, login: str, first_name: str, second_name: str, e_mail: str, planet: str, pass_wd: str):
+    def add_user(self, login: str, first_name: str, second_name: str, e_mail: str, planet: str, pass_wd: str,
+                 user_type: str):
+
         add_object = User(login=login,
                           first_name=first_name,
                           second_name=second_name,
                           e_mail=e_mail,
                           planet=planet,
-                          pswd_hash=pass_wd)  # TODO: добавить хэштрование
+                          pswd_hash=pass_wd,
+                          user_type = user_type,
+                          )  # TODO: добавить хэштрование
         self.session.add(add_object)
         self.session.commit()
 
@@ -91,7 +94,7 @@ class Crud():
 # print(__name__)
 if __name__ == "__main__":
     # print(Crud().get_user(1).first_name)
-    # Crud().add_user("Steve", "Sigal", "sigal@mail.ru", "Siatl")
+    Crud().add_user("malk", "Malk", "Malkolm", "sigal@mail.ru", "Brazil", "string", "qwqewrere")
     # Crud().delete_user2("Steve", "Sigal", "sigal@mail.ru")
     # print(Crud().select_user("musa1").pswd_hash)
     # Crud().add_question(3, "Question", "FALSE", "Do you like boxing")
@@ -99,7 +102,7 @@ if __name__ == "__main__":
     #print(Crud().add_answer_user(2, 'FALSE', 3))
      #print(Crud().add_answer_user(3, "FALSE", 4))
      #print(Crud().get_all_question(4))
-     print(Crud().get_count_question())
+     #print(Crud().get_count_question())
 # items = {"foo": "The Foo Wrestlers"}
 # item_id = "foo"
 # if item_id in items:

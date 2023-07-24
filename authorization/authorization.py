@@ -12,7 +12,7 @@ crud = Crud()
 
 expires_data = 15
 SECRET_KEY = "secret"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def create_access_token(user_name):
@@ -28,14 +28,10 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], crud: Crud):
     credentianals_extensions = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                              detail="UNAUthorized",
                                              headers={"WWW-Authenticate": "Bearer"}, )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[password_utils.ALGORITHM])
-        #print(payload["exp"])
-        user = crud.select_user(payload["sub"])
-        if user is None:
-            raise credentianals_extensions
-    except JWTError:
-        raise credentianals_extensions
+
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[password_utils.ALGORITHM])
+    print(f'payload:{payload}')
+    user = crud.select_user(payload["sub"])
     return user
 
 #def refresh(user: User, Authorize: AuthJWT = Depends()):

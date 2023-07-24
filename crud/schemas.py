@@ -1,11 +1,15 @@
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, String, Integer
+from sqlalchemy import Enum as sqlalchemy_enum
 from enum import Enum
-
-from sqlalchemy.sql.type_api import TypeEngine
 
 Base = declarative_base()
 
+
+class Roles(Enum):
+    USER = "USER"
+    RECRUT = "RECRUT"
+    ADMIN = "ADMIN"
 
 # class Status(TypeEngine['str'], Enum):
 #     TRUE = "TRUE",
@@ -21,6 +25,7 @@ class User(Base):
     e_mail = Column("e_mail", String(200))
     planet = Column("planet", String(200))
     pswd_hash = Column("pswd_hash", String(200))
+    user_type = Column("user_type", sqlalchemy_enum(Roles))
 
 
 # CREATE TABLE Questions (

@@ -3,12 +3,17 @@ from enum import Enum
 
 
 class User(BaseModel):
-    #login: str
+    class Roles(Enum):
+        USER = "USER"
+        RECRUT = "RECRUT"
+        ADMIN = "ADMIN"
+    login: str
     first_name: str
     second_name: str
     planet: str
     e_mail: str
     pswd: str
+    user_type: Roles
 
 
 class Question(BaseModel):

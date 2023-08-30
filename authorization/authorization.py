@@ -12,7 +12,7 @@ crud = Crud()
 
 expires_data = 15
 SECRET_KEY = "secret"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def create_access_token(user_name):
@@ -20,7 +20,6 @@ def create_access_token(user_name):
     expires = datetime.utcnow() + timedelta(minutes=expires_data)
     to_encode["exp"] = expires
     encode_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=password_utils.ALGORITHM)
-    print()
     return encode_jwt
 
 
@@ -28,7 +27,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], crud: Crud):
     credentianals_extensions = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                              detail="UNAUthorized",
                                              headers={"WWW-Authenticate": "Bearer"}, )
-
+    credentianals_extensions2 = HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    print(token)
     payload = jwt.decode(token, SECRET_KEY, algorithms=[password_utils.ALGORITHM])
     print(f'payload:{payload}')
     user = crud.select_user(payload["sub"])
@@ -40,7 +40,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], crud: Crud):
 
 if __name__ == "__main__":
     print(get_current_user(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtdXNhIiwiZXhwIjoxNjg3MjEzNDY3fQ.qqRPCEChdJcxRMuTSBAHrb4XMwULWOdIrAKdlEmIU11",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2JzIiwiZXhwIjoxNjkxMDg1NTYxfQ.LgSzcyVvDHs3OhySFNH_5BPcRevMs7vUGgUgAQYsZMA",
         crud).login)
     #token1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtdXNhIiwiZXhwIjoxNjg3MjEzNDY3fQ.qqRPCEChdJcxRMuTSBAHrb4XMwULWOdIrAKdlEmIU5E"
     #print(datetime.utcnow() + timedelta(minutes=expires_data))

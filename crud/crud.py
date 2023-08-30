@@ -52,6 +52,7 @@ class Crud():
     #     self.session.commit()
     def select_user(self, login: str):
         stmt = select(User.id).where(User.login == login)
+        #self.session.close()
         return self.get_user(self.session.scalars(stmt).first())
 
     def add_question(self, question_id: int, type_question: str, content: str, correct_answer: bool):
@@ -91,12 +92,26 @@ class Crud():
         result = self.get_question(self.session.scalars(smth).all()).content
         print(result)
 
+    def get_user_role(self, login: str): ## написано для чего то, если не будет применения то нужно удалить
+        return self.select_user(login).user_type
+
+    def get_questions_id(self):
+        result = []
+        #smth = self.session.query(Questions.id).all()
+        smth = self.session.execute(select(Questions.id)).all()
+        result = [i[0] for i in smth]
+
+        #print(result)
+        #print(smth1)
+        return result
+
 # print(__name__)
 if __name__ == "__main__":
     # print(Crud().get_user(1).first_name)
-    Crud().add_user("malk", "Malk", "Malkolm", "sigal@mail.ru", "Brazil", "string", "qwqewrere")
+    #Crud().add_user("malk", "Malk", "Malkolm", "sigal@mail.ru", "Brazil", "string", "qwqewrere")
     # Crud().delete_user2("Steve", "Sigal", "sigal@mail.ru")
-    # print(Crud().select_user("musa1").pswd_hash)
+    #print(Crud().select_user("musa").user_type)
+    print(Crud().get_questions_id())
     # Crud().add_question(3, "Question", "FALSE", "Do you like boxing")
     #print(Crud().add_answer_user(3, True, 1))
     #print(Crud().add_answer_user(2, 'FALSE', 3))

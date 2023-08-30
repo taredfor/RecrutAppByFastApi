@@ -28,4 +28,7 @@ class Answer(BaseModel):
     user_id: int
     user_answer: str
 
+class TestAnswer(BaseModel):
+    questions: dict
+
 

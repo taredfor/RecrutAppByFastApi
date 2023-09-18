@@ -7,10 +7,14 @@ Base = declarative_base()
 
 
 class Roles(Enum):
-    USER = "USER"
+    SITH = "SITH"
     RECRUT = "RECRUT"
     ADMIN = "ADMIN"
 
+
+class Planets(Enum):
+    JUPITER = "JUPITER"
+    MARS = "MARS"
 # class Status(TypeEngine['str'], Enum):
 #     TRUE = "TRUE",
 #     FALSE = "FALSE"
@@ -23,7 +27,7 @@ class User(Base):
     first_name = Column("first_name", String(200))
     second_name = Column("second_name", String(200))
     e_mail = Column("e_mail", String(200))
-    planet = Column("planet", String(200))
+    planet = Column("planet", sqlalchemy_enum(Planets))
     pswd_hash = Column("pswd_hash", String(200))
     user_type = Column("user_type", sqlalchemy_enum(Roles))
 

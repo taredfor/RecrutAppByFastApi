@@ -4,13 +4,18 @@ from enum import Enum
 
 class User(BaseModel):
     class Roles(Enum):
-        USER = "USER"
+        SITH = "SITH"
         RECRUT = "RECRUT"
         ADMIN = "ADMIN"
+
+    class Planets(Enum):
+        JUPITER = "JUPITER"
+        MARS = "MARS"
+
     login: str
     first_name: str
     second_name: str
-    planet: str
+    planet: Planets
     e_mail: str
     pswd: str
     user_type: Roles
@@ -25,10 +30,9 @@ class Question(BaseModel):
 
 class Answer(BaseModel):
     question_id: int
-    user_id: int
-    user_answer: str
+    user_answer: bool
 
-class TestAnswer(BaseModel):
-    questions: dict
+
+
 
 

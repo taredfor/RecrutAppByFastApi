@@ -4,12 +4,12 @@ from fastapi import FastAPI, HTTPException, Header, Depends
 from starlette import status
 from enum import Enum
 
-from data_request_model import User, Question, Answer, TestAnswer
+from data_request_model import User, Question, Answer
 from crud.crud import Crud
 from password_utils.password_utils import hash_password, verify_password
 from authorization.authorization import create_access_token, get_current_user
 from auxiliary_package.range_function import Range
-from typing import Annotated, Union
+from typing import Annotated, Union, List
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from random import choice
 
@@ -49,7 +49,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
 
 @app.post('/add-user')
 async def add_user(parameters: User):
-    crud.add_user(parameters.login, parameters.first_name, parameters.second_name, parameters.e_mail, parameters.planet,
+    crud.add_user(parameters.login, parameters.first_name, parameters.second_name, parameters.e_mail, parameters.planet.value,
                   hash_password(parameters.pswd), parameters.user_type.value)
     return 'User is added'
 
@@ -84,8 +84,8 @@ async def add_new_question(parameter: Question):
 
 
 @app.post('/add/answer')
-async def add_answer(parameter: Answer):
-    crud.add_answer_user(parameter.question_id, parameter.user_answer, parameter.user_id)
+async def add_answer(parameter: Answer, question_id):
+    crud.add_answer_user(question_id, parameter.user_answer)
     return 'Answer was sented'
 
 
@@ -101,7 +101,7 @@ async def get_question(token: Annotated[str, Depends(oauth2_scheme)]):
     #count_id = crud.get_count_question()
     question_id = crud.get_questions_id()
     list_id = []
-    for i in range(min(len(question_id),3)):
+    for i in range(min(len(question_id), 3)):
         element = choice(question_id)
         list_id.append(element)
         question_id.remove(element)
@@ -129,5 +129,34 @@ async def get_role(token: Annotated[str, Depends(oauth2_scheme)]):
     return {"user_role": user.user_type}  # TODO: привести переменную к одному знаменателю
 
 @app.post('/post_answers')
-async def post_answers_test(test_answer: TestAnswer):
-    print(test_answer.questions)
+async def post_answers_test(test_answer: List[Answer], token: Annotated[str, Depends(oauth2_scheme)]):
+    print(test_answer)
+    user = get_current_user(token, crud)
+    user_id = user.id
+    answers = test_answer
+    for answer in answers:
+        crud.add_answer_user(answer.question_id, str(answer.user_answer), user_id)
+    #answers = test_answer.questions
+    #for answer in answers:
+     #   main_answer = answer[0:len(answer) - 1]
+      ## print(crud.get_id_from_questions(main_answer))
+
+@app.get('/get_user_id_from_answers')
+async def get_user_id_from_answers(token: Annotated[str, Depends(oauth2_scheme)]):
+    user = get_current_user(token, crud)
+    if crud.get_user_id_from_table_answers(user.id):
+        return {"is_user": True}
+    return {"is_user": False}
+
+@app.get('/get_planet_sith')
+async def get_planet_sith(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentianals_extensions = HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                             detail={"Error": "User not found"},
+                                             headers={"Error": "User not found"}, )
+    user = get_current_user(token, crud)
+    if crud.get_user_from_planet_name(user.planet):
+        return crud.get_user_from_planet_name(user.planet)
+    raise credentianals_extensions
+
+
+

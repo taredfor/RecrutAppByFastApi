@@ -46,15 +46,15 @@ class Crud():
         print(delete_object)
         self.session.delete(delete_object)
         self.session.commit()
-
+    # TODO: Удалить комменты
     # def delete_user2(self, first_name: str, second_name: str, e_mail: str):
     #     delete_object = self.session.execute(select(User).where(User.first_name == first_name)).first()
     #     print((delete_object))
     #     self.session.delete(delete_object)
     #     self.session.commit()
     def select_user(self, login: str):
-        stmt = select(User.id).where(User.login == login)
-        # self.session.close()
+        stmt = select(User.id).where(User.login == login) # TODO: smth -> user
+        # self.session.close() # TODO: Удалить комменты
         return self.get_user(self.session.scalars(stmt).first())
 
     def recrut_exist(self, id: int) -> bool:
@@ -69,9 +69,10 @@ class Crud():
         self.session.add(add_object)
         self.session.commit()
 
+    # TODO: smth -> question
     def add_answer_user(self, question_id: int, your_answer: str, user_id: int):
         smth = select(Questions.id).where(Questions.id == question_id)
-        print(type(smth))
+        print(type(smth)) ## TODO: remove
         correct_answer = self.get_question(self.session.scalars(smth).first()).correct_answer
         print(correct_answer)
         if correct_answer == your_answer:
@@ -94,20 +95,20 @@ class Crud():
         return count_question
 
     def get_all_question(self, question_id: int):
-        smth = select(Questions.id).where(Questions.id == question_id)
+        smth = select(Questions.id).where(Questions.id == question_id) ## TODO: smth -> ?
         result = self.get_question(self.session.scalars(smth).all()).content
         print(result)
 
-    def get_user_role(self, login: str):  ## написано для чего то, если не будет применения то нужно удалить
+    def get_user_role(self, login: str):  ##TODO: написано для чего то, если не будет применения то нужно удалить
         return self.select_user(login).user_type
 
     def get_questions_id(self):
         result = []
-        # smth = self.session.query(Questions.id).all()
+        # smth = self.session.query(Questions.id).all() # TODO: remove
         smth = self.session.execute(select(Questions.id)).all()
         result = [i[0] for i in smth]
 
-        # print(result)
+        # print(result) # TODO: remove
         # print(smth1)
         return result
 
@@ -116,10 +117,10 @@ class Crud():
         return smth.first()[0]
 
     def get_user_id_from_table_answers(self, user_id: int):
-        #smth = self.session.execute(select(Answers.user_id).where(Answers.user_id == user_id))
+        #smth = self.session.execute(select(Answers.user_id).where(Answers.user_id == user_id)) #TODO: smth -> ?
         smth = self.session.query(Answers).filter(Answers.user_id == user_id)
         print(smth.all())
-        return smth.all()#bool(smth.first()[0])
+        return smth.all()#bool(smth.first()[0]) #TODO: remove
 
     def get_user_from_planet_name(self, planet: str):
         user_type_sq = 'RECRUT'
@@ -128,7 +129,7 @@ class Crud():
         planet_list = []
         for i in result:
             user = UserSchema(exclude=['pswd_hash', 'e_mail'])
-            # user_name = i.login
+            # user_name = i.login #TODO: remove
             # user_planet_test = i.planet.value
             # user_role = i.user_type.value
             #print(user_planet_test)
@@ -137,20 +138,20 @@ class Crud():
             user_json["planet"] = user_json["planet"].value
             user_json["user_type"] = user_json["user_type"].value
             planet_list.append(user_json)
-        #print(planet_list)
+        #print(planet_list) #TODO: remove
         return planet_list
     def get_score(self, recrut_id: int) -> int:
-        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id)
+        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id) #TODO: smth -> ?
         result = 0
         for answer in smth.all():
             if answer.is_correct == "TRUE":
                 result += 1
         return result
     def recrut_done_with_test(self, recrut_id: int) -> bool:
-        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id)
+        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id) #TODO: smth -> ?
         return bool(smth.all())
     def get_max_score(self, recrut_id: int) -> int:  #TODO удалить данный метод
-        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id)
+        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id) #TODO: smth -> ?
         return len(smth.all())
     def hire(self, recrut_id):
         user = self.get_user(recrut_id)
@@ -160,7 +161,7 @@ class Crud():
 
 
 
-# print(__name__)
+# print(__name__) #TODO: remove
 if __name__ == "__main__":
     # print(Crud().get_user(1).first_name)
     # Crud().add_user("malk", "Malk", "Malkolm", "sigal@mail.ru", "Brazil", "string", "qwqewrere")

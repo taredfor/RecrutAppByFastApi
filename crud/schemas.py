@@ -7,6 +7,7 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 Base = declarative_base()
 
 
+# TODO: Сделать единую точку доступа к этому классу
 class Roles(Enum):
     SITH = "SITH"
     RECRUT = "RECRUT"

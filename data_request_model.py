@@ -3,12 +3,12 @@ from enum import Enum
 
 
 class User(BaseModel):
-    class Roles(Enum):
+    class Roles(Enum): # TODO: сделать единую точку доступа к этому классу
         SITH = "SITH"
         RECRUT = "RECRUT"
         ADMIN = "ADMIN"
 
-    class Planets(Enum):
+    class Planets(Enum): # TODO: сделать единую точку доступа к этому классу
         JUPITER = "JUPITER"
         MARS = "MARS"
 

@@ -2,6 +2,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, String, Integer
 from sqlalchemy import Enum as sqlalchemy_enum
 from enum import Enum
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 Base = declarative_base()
 
@@ -19,6 +20,11 @@ class Planets(Enum):
 #     TRUE = "TRUE",
 #     FALSE = "FALSE"
 
+class HireTypes(Enum):
+    WAITING = "WAITING"
+    HIRED = "HIRED"
+    NOT_HIRED = "NOT_HIRED"
+    NOT_RECRUT = "NOT_RECRUT"
 
 class User(Base):
     __tablename__ = "Users"
@@ -30,6 +36,7 @@ class User(Base):
     planet = Column("planet", sqlalchemy_enum(Planets))
     pswd_hash = Column("pswd_hash", String(200))
     user_type = Column("user_type", sqlalchemy_enum(Roles))
+    hire_type = Column("hire_type", sqlalchemy_enum(HireTypes))
 
 
 # CREATE TABLE Questions (
@@ -57,3 +64,10 @@ class Answers(Base):
     question_id = Column("question_id", Integer)
     user_id = Column("user_id", Integer)
     is_correct = Column("is_correct", String(200))
+    def __repr__(self):
+        return f'<user_id: {self.user_id}; question_id: {self.question_id}; result: {self.is_correct}>'
+
+
+class UserSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = User

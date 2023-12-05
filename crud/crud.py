@@ -4,8 +4,10 @@ import sqlalchemy
 import sqlalchemy.orm
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
-from .schemas import User, Questions, Answers
+from .schemas import User, Questions, Answers, UserSchema, HireTypes
+
 from enum import Enum
+
 
 
 # engine = create_engine('mysql+mysqldb://root:qwerty123@localhost', pool_recycle=3600)
@@ -54,6 +56,10 @@ class Crud():
         stmt = select(User.id).where(User.login == login)
         # self.session.close()
         return self.get_user(self.session.scalars(stmt).first())
+
+    def recrut_exist(self, id: int) -> bool:
+        select_statement = select(User).where((User.id == id) & (User.user_type == 'RECRUT'))
+        return bool(self.session.execute(select_statement).first())
 
     def add_question(self, question_id: int, type_question: str, content: str, correct_answer: bool):
         add_object = Questions(question_id=question_id,
@@ -110,24 +116,50 @@ class Crud():
         return smth.first()[0]
 
     def get_user_id_from_table_answers(self, user_id: int):
-        smth = self.session.execute(select(Answers.user_id).where(Answers.user_id == user_id))
-        return bool(smth.first()[0])
+        #smth = self.session.execute(select(Answers.user_id).where(Answers.user_id == user_id))
+        smth = self.session.query(Answers).filter(Answers.user_id == user_id)
+        print(smth.all())
+        return smth.all()#bool(smth.first()[0])
 
     def get_user_from_planet_name(self, planet: str):
         user_type_sq = 'RECRUT'
         smth = self.session.query(User).filter((User.user_type == user_type_sq) & (User.planet == planet))
         result = smth.all()
         planet_list = []
-        print(result)
         for i in result:
-            print(i)
-            user_name = i.login
-            user_planet_test = i.planet.value
-            user_role = i.user_type.value
-            print(user_planet_test)
-            planet_list.append({"user_name": user_name, "user_planet": user_planet_test, "user_role": user_role})
-        print(planet_list)
+            user = UserSchema(exclude=['pswd_hash', 'e_mail'])
+            # user_name = i.login
+            # user_planet_test = i.planet.value
+            # user_role = i.user_type.value
+            #print(user_planet_test)
+            #planet_list.append({"user_name": user_name, "user_planet": user_planet_test, "user_role": user_role})
+            user_json = user.dump(i)
+            user_json["planet"] = user_json["planet"].value
+            user_json["user_type"] = user_json["user_type"].value
+            planet_list.append(user_json)
+        #print(planet_list)
         return planet_list
+    def get_score(self, recrut_id: int) -> int:
+        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id)
+        result = 0
+        for answer in smth.all():
+            if answer.is_correct == "TRUE":
+                result += 1
+        return result
+    def recrut_done_with_test(self, recrut_id: int) -> bool:
+        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id)
+        return bool(smth.all())
+    def get_max_score(self, recrut_id: int) -> int:  #TODO удалить данный метод
+        smth = self.session.query(Answers).filter(Answers.user_id == recrut_id)
+        return len(smth.all())
+    def hire(self, recrut_id):
+        user = self.get_user(recrut_id)
+        user.hire_type = HireTypes.HIRED
+        self.session.commit()
+
+
+
+
 # print(__name__)
 if __name__ == "__main__":
     # print(Crud().get_user(1).first_name)
@@ -137,7 +169,10 @@ if __name__ == "__main__":
     # print(Crud().get_questions_id())
     # print(Crud().get_id_from_questions("Do you like football"))
     #print(Crud().get_user_id_from_table_answers(7))
-    print(Crud().get_user_from_planet_name('JUPITER'))
+    #print(Crud().get_user_from_planet_name('JUPITER'))
+    #print(Crud().recrut_done_with_test(12))
+    #print(Crud().recrut_done_with_test(20))
+    print(Crud().recrut_exist(12))
     # Crud().add_question(3, "Question", "FALSE", "Do you like boxing")
     # print(Crud().add_answer_user(3, True, 1))
     # print(Crud().add_answer_user(2, 'FALSE', 3))

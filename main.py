@@ -34,12 +34,6 @@ oauth2_scheme_1 = OAuth2PasswordBearer(tokenUrl="login")
 SUCCESS_SCORE = 2
 QUESTION_COUNT = 3
 
-# TODO: remove
-@app.get('/')
-async def test():
-    return {'hello': 'recrut'}
-
-
 @app.post('/token')
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = crud.select_user(form_data.username).login

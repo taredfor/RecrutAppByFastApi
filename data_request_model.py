@@ -1,17 +1,8 @@
 from pydantic import BaseModel
-from enum import Enum
+from crud.auxiliary_class import Roles, Planets
 
 
 class User(BaseModel):
-    class Roles(Enum): # TODO: сделать единую точку доступа к этому классу
-        SITH = "SITH"
-        RECRUT = "RECRUT"
-        ADMIN = "ADMIN"
-
-    class Planets(Enum): # TODO: сделать единую точку доступа к этому классу
-        JUPITER = "JUPITER"
-        MARS = "MARS"
-
     login: str
     first_name: str
     second_name: str

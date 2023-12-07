@@ -34,12 +34,6 @@ oauth2_scheme_1 = OAuth2PasswordBearer(tokenUrl="login")
 SUCCESS_SCORE = 2
 QUESTION_COUNT = 3
 
-
-@app.get('/')
-async def test():
-    return {'hello': 'recrut'}
-
-
 @app.post('/token')
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = crud.select_user(form_data.username).login
@@ -83,7 +77,7 @@ async def verify_password_main(login: str, pass_wd: str):
         raise credentials_exception
     return create_login_token_pair(login)
 
-
+# TODO: remove
 @app.get('/test')
 async def test_get_user(token):
     return get_current_user(token, crud)
@@ -104,7 +98,7 @@ async def add_answer(parameter: Answer, question_id):
 
 @app.get('/get-questions')
 async def get_question(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentianals_extensions = HTTPException(
+    credentianals_extensions = HTTPException( # TODO: fix typo
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="UNAUthorized",
         headers={"WWW-Authenticate": "Bearer"}, )
@@ -124,6 +118,7 @@ async def get_question(token: Annotated[str, Depends(oauth2_scheme)]):
     return d_ict
 
 
+# TODO: узнать, что это за метод, если не нужен - удалить
 @app.get('/items')
 async def read_items(user_agent: Annotated[Union[str, None], Header()] = None,
                      authorization: Annotated[
@@ -135,32 +130,25 @@ async def read_items(user_agent: Annotated[Union[str, None], Header()] = None,
 
 @app.get('/role')
 async def get_role(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentianals_extensions = HTTPException(
+    credentianals_excepsions = HTTPException( # TODO: typo exceptions
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="UNAUthorized",
         headers={"WWW-Authenticate": "Bearer"}, )
     user = get_current_user(token, crud)
     if not user:
-        raise credentianals_extensions
+        raise credentianals_excepsions
     return {
         "user_role": user.user_type}  # TODO: привести переменную к одному знаменателю
-
 
 @app.post('/post_answers')
 async def post_answers_test(test_answer: List[Answer],
                             token: Annotated[str, Depends(oauth2_scheme)]):
-    print(test_answer)
     user = get_current_user(token, crud)
     user_id = user.id
     answers = test_answer
     for answer in answers:
         crud.add_answer_user(answer.question_id, str(answer.user_answer),
                              user_id)
-    # answers = test_answer.questions
-    # for answer in answers:
-    #   main_answer = answer[0:len(answer) - 1]
-    ## print(crud.get_id_from_questions(main_answer))
-
 
 @app.get('/was_user_tested')
 async def get_user_id_from_answers(
@@ -184,7 +172,6 @@ async def get_planet_sith(token: Annotated[str, Depends(oauth2_scheme)]):
         detail={"Error": "User not found"},
         headers={"Error": "User not found"}, )
     user = get_current_user(token, crud)
-    print(user.user_type)
     if user.user_type == Roles.RECRUT:
         raise NotEnoughPermissions()
     if crud.get_user_from_planet_name(user.planet):

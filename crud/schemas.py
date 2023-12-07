@@ -3,28 +3,30 @@ from sqlalchemy import Column, String, Integer
 from sqlalchemy import Enum as sqlalchemy_enum
 from enum import Enum
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from auxiliary_class import Roles, Planets, HireTypes
 
 Base = declarative_base()
 
 
-class Roles(Enum):
-    SITH = "SITH"
-    RECRUT = "RECRUT"
-    ADMIN = "ADMIN"
-
-
-class Planets(Enum):
-    JUPITER = "JUPITER"
-    MARS = "MARS"
-# class Status(TypeEngine['str'], Enum):
-#     TRUE = "TRUE",
-#     FALSE = "FALSE"
-
-class HireTypes(Enum):
-    WAITING = "WAITING"
-    HIRED = "HIRED"
-    NOT_HIRED = "NOT_HIRED"
-    NOT_RECRUT = "NOT_RECRUT"
+# TODO: Сделать единую точку доступа к этому классу
+# class Roles(Enum):
+#     SITH = "SITH"
+#     RECRUT = "RECRUT"
+#     ADMIN = "ADMIN"
+#
+#
+# class Planets(Enum):
+#     JUPITER = "JUPITER"
+#     MARS = "MARS"
+# # class Status(TypeEngine['str'], Enum):
+# #     TRUE = "TRUE",
+# #     FALSE = "FALSE"
+#
+# class HireTypes(Enum):
+#     WAITING = "WAITING"
+#     HIRED = "HIRED"
+#     NOT_HIRED = "NOT_HIRED"
+#     NOT_RECRUT = "NOT_RECRUT"
 
 class User(Base):
     __tablename__ = "Users"
@@ -37,16 +39,6 @@ class User(Base):
     pswd_hash = Column("pswd_hash", String(200))
     user_type = Column("user_type", sqlalchemy_enum(Roles))
     hire_type = Column("hire_type", sqlalchemy_enum(HireTypes))
-
-
-# CREATE TABLE Questions (
-#   id int NOT NULL AUTO_INCREMENT,
-#   question_id int NOT NULL,
-#   type_question varchar(255) DEFAULT NULL,
-#   correct_answer ENUM('TRUE','FALSE'),
-#   content varchar(255),
-#   PRIMARY KEY (id)
-# );
 
 
 class Questions(Base):

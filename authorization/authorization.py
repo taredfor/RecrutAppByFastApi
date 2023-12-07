@@ -72,10 +72,6 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], crud: Crud):
     return user
 
 
-# def refresh(user: User, Authorize: AuthJWT = Depends()):
-#    Authorize.create_refresh_token(user.login,)
-
-
 if __name__ == "__main__":
     print(get_current_user(
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2JzIiwiZXhwIjoxNjkxMDg1NTYxfQ.LgSzcyVvDHs3OhySFNH_5BPcRevMs7vUGgUgAQYsZMA",

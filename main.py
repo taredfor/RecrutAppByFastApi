@@ -130,7 +130,7 @@ async def read_items(user_agent: Annotated[Union[str, None], Header()] = None,
 
 @app.get('/role')
 async def get_role(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentianals_excepsions = HTTPException(
+    credentianals_excepsions = HTTPException( # TODO: typo exceptions
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="UNAUthorized",
         headers={"WWW-Authenticate": "Bearer"}, )

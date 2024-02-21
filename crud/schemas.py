@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Integer
 from sqlalchemy import Enum as sqlalchemy_enum
 from enum import Enum
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from auxiliary_class import Roles, Planets, HireTypes
+from .auxiliary_class import Roles, Planets, HireTypes
 
 Base = declarative_base()
 
@@ -26,7 +26,7 @@ Base = declarative_base()
 #     WAITING = "WAITING"
 #     HIRED = "HIRED"
 #     NOT_HIRED = "NOT_HIRED"
-#     NOT_RECRUT = "NOT_RECRUT"
+#     NOT_RECRUT = "NOT_RECRUT"4
 
 class User(Base):
     __tablename__ = "Users"

@@ -22,7 +22,7 @@ class Crud():
         return self.session.get(Questions, question_id)
 
     def add_user(self, login: str, first_name: str, second_name: str, e_mail: str, planet: str, pass_wd: str,
-                 user_type: str):
+                 user_type: str, hire_type: str):
 
         add_object = User(login=login,
                           first_name=first_name,
@@ -31,6 +31,7 @@ class Crud():
                           planet=planet,
                           pswd_hash=pass_wd,
                           user_type=user_type,
+                          hire_type=hire_type
                           )  # TODO: добавить хэштрование
         self.session.add(add_object)
         self.session.commit()
@@ -128,6 +129,13 @@ class Crud():
         user.hire_type = HireTypes.HIRED
         self.session.commit()
 
+    def is_email_exist(self, email: str)->bool:
+        email_users = self.session.query(User).filter(User.e_mail == email).all()
+        return bool(email_users)
+
+    def is_login_exist(self, login: str)->bool:
+        users = self.session.query(User).filter(User.login == login).all()
+        return bool(users)
 
 if __name__ == "__main__":
     # print(Crud().get_user(1).first_name)
@@ -146,7 +154,8 @@ if __name__ == "__main__":
     # print(Crud().add_answer_user(3, "FALSE", 4))
     # print(Crud().get_all_question(4))
     # print(Crud().get_count_question())
-# items = {"foo": "The Foo Wrestlers"}
-# item_id = "foo"
-# if item_id in items:
-#     print(items[item_id])
+    print(Crud().is_email_exist('mark@123.com'))
+    print(Crud().is_email_exist('mark@1234.com'))
+    print(Crud().is_login_exist('jobss'))
+    print(Crud().is_login_exist('jobssssss'))
+    pass

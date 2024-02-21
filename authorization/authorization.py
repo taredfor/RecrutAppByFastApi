@@ -10,7 +10,7 @@ from crud.schemas import User
 
 crud = Crud()
 
-expires_delta_access = timedelta(seconds=60)
+expires_delta_access = timedelta(seconds=300)
 expires_delta_refresh = timedelta(days=30)
 SECRET_KEY = "secret"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -44,9 +44,12 @@ def create_login_token_pair(username: str):
 
 def decode_access_token(token):
     try:
+        print(type(token))
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        if payload['type'] != "access_token":
-            raise HTTPException(status_code=401, detail='Invalid token')
+        print(payload['type'])
+        # if payload['type'] != "access_token":
+        #     print("access token 1")
+        #     raise HTTPException(status_code=401, detail='Invalid token')
         return payload['user_name']
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail='Signature has expired')
@@ -73,12 +76,12 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], crud: Crud):
 
 
 if __name__ == "__main__":
-    print(get_current_user(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2JzIiwiZXhwIjoxNjkxMDg1NTYxfQ.LgSzcyVvDHs3OhySFNH_5BPcRevMs7vUGgUgAQYsZMA",
-        crud).login)
+    #print(get_current_user(
+     #   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2JzIiwiZXhwIjoxNjkxMDg1NTYxfQ.LgSzcyVvDHs3OhySFNH_5BPcRevMs7vUGgUgAQYsZMA",
+     #   crud).login)
     # token1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtdXNhIiwiZXhwIjoxNjg3MjEzNDY3fQ.qqRPCEChdJcxRMuTSBAHrb4XMwULWOdIrAKdlEmIU5E"
     # print(datetime.utcnow() + timedelta(minutes=expires_data))
-    # print(jwt.decode(token1, SECRET_KEY, algorithms=[password_utils.ALGORITHM]))
+    print(decode_access_token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJqb2JzIiwidHlwZSI6ImFjY2Vzc190b2tlbiIsImV4cCI6MTcwMjA0MDg1M30.Zz71bgjZowUu_XwlBsRKywt2Hu7_OijNyo_RPUIOo78"))
     # print(jws.get_unverified_header(token1).keys())
 
 # "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtdXNhIiwiZXhwIjoxNjg3Mjc4MTY3fQ.KBhzxqgQ0SLtUd_I3k7r3dqEy4VM_dm9H-R2ZBYjDvE"

@@ -1,16 +1,15 @@
 import http
 import logging
-from exceptions import NotEnoughPermissions
+from exceptions import NotEnoughPermissions, UserAlreadyExist, UserIsNotExist
 from fastapi import FastAPI, HTTPException, Header, Depends
 from starlette import status
 from enum import Enum
 
-from data_request_model import User, Question, Answer
+from data_request_model import User, Question, Answer, Recrut, Login, Email
 from crud.crud import Crud
 from password_utils.password_utils import hash_password, verify_password
 from authorization.authorization import create_access_token, get_current_user, \
     create_login_token_pair
-from auxiliary_package.range_function import Range
 from typing import Annotated, Union, List
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from random import choice
@@ -27,7 +26,6 @@ logging.critical("A message of CRITICAL severity")
 app = FastAPI()
 
 crud = Crud()
-range_func = Range()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 oauth2_scheme_1 = OAuth2PasswordBearer(tokenUrl="login")
@@ -54,9 +52,21 @@ async def add_user(parameters: User):
     crud.add_user(parameters.login, parameters.first_name,
                   parameters.second_name, parameters.e_mail,
                   parameters.planet.value,
-                  hash_password(parameters.pswd), parameters.user_type.value)
+                  hash_password(parameters.pswd), parameters.user_role.value)
     return 'User is added'
 
+
+@app.post('/add-recrut')
+async def add_recrut(parameters: Recrut):
+    if crud.is_email_exist(parameters.e_mail):
+        raise UserAlreadyExist("e-mail")
+    if crud.is_login_exist(parameters.login):
+        raise UserAlreadyExist("login")
+    crud.add_user(parameters.login, parameters.first_name,
+                  parameters.second_name, parameters.e_mail,
+                  parameters.planet.value,
+                  hash_password(parameters.pswd), 'RECRUT', 'WAITING')
+    return 'Recrut is added'
 
 @app.get('/login')
 async def verify_password_main(login: str, pass_wd: str):
@@ -98,15 +108,10 @@ async def add_answer(parameter: Answer, question_id):
 
 @app.get('/get-questions')
 async def get_question(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentianals_extensions = HTTPException( # TODO: fix typo
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="UNAUthorized",
-        headers={"WWW-Authenticate": "Bearer"}, )
     d_ict = {}
     user = get_current_user(token, crud)
     if not user:
-        raise credentianals_extensions
-    # count_id = crud.get_count_question()
+        raise UserIsNotExist(user)
     question_id = crud.get_questions_id()
     list_id = []
     for i in range(min(len(question_id), QUESTION_COUNT)):
@@ -117,28 +122,13 @@ async def get_question(token: Annotated[str, Depends(oauth2_scheme)]):
         d_ict[i] = crud.get_question(i).content
     return d_ict
 
-
-# TODO: узнать, что это за метод, если не нужен - удалить
-@app.get('/items')
-async def read_items(user_agent: Annotated[Union[str, None], Header()] = None,
-                     authorization: Annotated[
-                         Union[str, None], Header()] = None):
-    print(user_agent)
-    print(authorization)
-    return {"User-agent": user_agent, "Authorization": authorization}
-
-
 @app.get('/role')
 async def get_role(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentianals_excepsions = HTTPException( # TODO: typo exceptions
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="UNAUthorized",
-        headers={"WWW-Authenticate": "Bearer"}, )
     user = get_current_user(token, crud)
     if not user:
-        raise credentianals_excepsions
+        raise UserIsNotExist(user)
     return {
-        "user_role": user.user_type}  # TODO: привести переменную к одному знаменателю
+        "user_role": user.user_role}
 
 @app.post('/post_answers')
 async def post_answers_test(test_answer: List[Answer],
@@ -158,7 +148,7 @@ async def get_user_id_from_answers(
         detail={"Error": "User not found"},
         headers={"Error": "User not found"}, )
     user = get_current_user(token, crud)
-    if user.user_type == Roles.RECRUT:
+    if user.user_role == Roles.RECRUT:
         if crud.get_user_id_from_table_answers(user.id):
             return {"was_tested": True}
         return {"was_tested": False}
@@ -172,7 +162,7 @@ async def get_planet_sith(token: Annotated[str, Depends(oauth2_scheme)]):
         detail={"Error": "User not found"},
         headers={"Error": "User not found"}, )
     user = get_current_user(token, crud)
-    if user.user_type == Roles.RECRUT:
+    if user.user_role == Roles.RECRUT:
         raise NotEnoughPermissions()
     if crud.get_user_from_planet_name(user.planet):
         return crud.get_user_from_planet_name(user.planet)
@@ -182,7 +172,7 @@ async def get_planet_sith(token: Annotated[str, Depends(oauth2_scheme)]):
 @app.get('/get_score/{recrut_id}')
 async def get_score(recrut_id: int, token: Annotated[str, Depends(oauth2_scheme)]):
     user = get_current_user(token, crud)
-    if user.user_type == Roles.RECRUT:
+    if user.user_role == Roles.RECRUT:
         raise NotEnoughPermissions()
     if not crud.recrut_exist(recrut_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -198,7 +188,7 @@ async def get_score(recrut_id: int, token: Annotated[str, Depends(oauth2_scheme)
 @app.get('/hire/{recrut_id}')
 async def hire_recrut(recrut_id: int, token: Annotated[str, Depends(oauth2_scheme)]):
     user = get_current_user(token, crud)
-    if user.user_type == Roles.RECRUT:
+    if user.user_role == Roles.RECRUT:
         raise NotEnoughPermissions()
     if not crud.recrut_exist(recrut_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -206,4 +196,27 @@ async def hire_recrut(recrut_id: int, token: Annotated[str, Depends(oauth2_schem
     crud.hire(recrut_id)
     hired_recrut = crud.get_user(recrut_id)
     return {"user_id": hired_recrut.id, "status": hired_recrut.hire_type}
+
+@app.get('/status')
+async def get_recrut_status(token: Annotated[str, Depends(oauth2_scheme)]):
+    recrut = get_current_user(token, crud)
+    if recrut.user_role != Roles.RECRUT or not crud.recrut_exist(recrut.id):
+        if not crud.recrut_exist(recrut.id):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail={"Error": "Recrut not found"})
+    return {"recrut_status": recrut.hire_type}
+
+@app.get('/is_login_exists')
+async def validate_recrut_login(recrut_login: Login):
+    recrut = crud.is_login_exist(recrut_login.user_login)
+    print(recrut)
+    return {"login_exists": recrut}
+
+@app.get('/is_email_exists')
+async def validate_recrut_email(e_mail: Email):
+    recrut = crud.is_email_exist(e_mail.e_mail)
+    print(recrut)
+    return {"email_exists": recrut}
+
+
 

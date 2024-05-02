@@ -9,8 +9,15 @@ class User(BaseModel):
     planet: Planets
     e_mail: str
     pswd: str
-    user_type: Roles
+    user_role: Roles
 
+class Recrut(BaseModel):
+    login: str
+    first_name: str
+    second_name: str
+    planet: Planets
+    e_mail: str
+    pswd: str
 
 class Question(BaseModel):
     question_id: int
@@ -23,6 +30,11 @@ class Answer(BaseModel):
     question_id: int
     user_answer: bool
 
+class Login(BaseModel):
+    user_login: str
+
+class Email(BaseModel):
+    e_mail: str
 
 
 

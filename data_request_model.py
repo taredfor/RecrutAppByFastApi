@@ -19,7 +19,6 @@ class Recrut(BaseModel):
     e_mail: str
     pswd: str
 
-
 class Question(BaseModel):
     question_id: int
     type_question: str
@@ -34,6 +33,8 @@ class Answer(BaseModel):
 class Login(BaseModel):
     user_login: str
 
+class Email(BaseModel):
+    e_mail: str
 
 
 

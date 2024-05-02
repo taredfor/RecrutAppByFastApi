@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Header, Depends
 from starlette import status
 from enum import Enum
 
-from data_request_model import User, Question, Answer, Recrut, Login
+from data_request_model import User, Question, Answer, Recrut, Login, Email
 from crud.crud import Crud
 from password_utils.password_utils import hash_password, verify_password
 from authorization.authorization import create_access_token, get_current_user, \
@@ -211,6 +211,12 @@ async def validate_recrut_login(recrut_login: Login):
     recrut = crud.is_login_exist(recrut_login.user_login)
     print(recrut)
     return {"login_exists": recrut}
+
+@app.get('/is_email_exists')
+async def validate_recrut_email(e_mail: Email):
+    recrut = crud.is_email_exist(e_mail.e_mail)
+    print(recrut)
+    return {"email_exists": recrut}
 
 
 

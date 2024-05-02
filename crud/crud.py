@@ -129,8 +129,8 @@ class Crud():
         user.hire_type = HireTypes.HIRED
         self.session.commit()
 
-    def is_email_exist(self, email: str)->bool:
-        email_users = self.session.query(User).filter(User.e_mail == email).all()
+    def is_email_exist(self, e_mail: str)->bool:
+        email_users = self.session.query(User).filter(User.e_mail == e_mail).all()
         return bool(email_users)
 
     def is_login_exist(self, login: str)->bool:
@@ -154,8 +154,9 @@ if __name__ == "__main__":
     # print(Crud().add_answer_user(3, "FALSE", 4))
     # print(Crud().get_all_question(4))
     # print(Crud().get_count_question())
-    print(Crud().is_email_exist('mark@123.com'))
-    print(Crud().is_email_exist('mark@1234.com'))
-    print(Crud().is_login_exist('jobss'))
-    print(Crud().is_login_exist('jobssssss'))
+    # print(Crud().is_email_exist('mark@123.com'))
+    # print(Crud().is_email_exist('mark@1234.com'))
+    # print(Crud().is_login_exist('jobss'))
+    # print(Crud().is_login_exist('jobssssss'))
+    print(Crud().is_email_exist("qweweryt@1213.com"))
     pass
